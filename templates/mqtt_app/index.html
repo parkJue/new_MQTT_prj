@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-sans h-screen bg-gray-100 ">
+    <div id="data-display">
+        <div class="bg-blue-600/40 text-white">
+            <header class="flex-grow ml-20">
+                <div id="cal-data" class="text-right text-3xl "></div>
+                <div id="time-data" class="text-right text-2xl"></div>
+            </header>
+            <hr>
+        </div>
+        <div class="flex justify-between">
+            <span class="ml-6 w-1/2 mt-5 text-center">
+                <h2 class="-mt-0 text-xl font-bold text-blue-800">PCS Data</h2>
+                <table id="pcs-table" class="mt-5 w-11/12 border-2 "></table>
+            </span>
+            <span class="ml-6 w-1/2 mt-5 text-center">
+                <h2 class="-mt-0 text-xl font-bold text-blue-800">Battery Data</h2>
+                <table id="bat-table" class="mt-5 w-11/12 border-2"></table>
+            </span>
+        </div>
+    </div>
+
+    <script>
+        function fetchData() {
+            $.ajax({
+                url: '/fetch/',
+                type: 'GET', // GET방식으로 요청Fbo
+                success: function(response) {
+                    displayTable(response['pcs_data'], 'pcs-table', 'W', 'Hz', 'V', 'A');
+                    displayTable(response['bat_data'], 'bat-table', '%', '%', 'V', 'A');
+
+                    $('#cal-data').text(response['cal_data']);
+                    $('#time-data').text(response['time_data']); 
+                },
+                error: function() {
+                    $('#data-display').html('<p>에러</p>');
+                }
+            });
+        }
+
+        function displayTable(data, tableId, unit1, unit2, unit3, unit4) {
+            var tableHtml = '<table>';
+            for (var key in data) {
+                var value = data[key];
+                var unit = '';
+                if (key === 'active_power' || key === 'frequency') {
+                    unit = (key === 'active_power' ? unit1 : unit2);
+                } else if (key.includes('SO')) {
+                    unit = unit1;   
+                } else if (key.includes('vol')) {
+                    unit = unit3;
+                } else if (key.includes('cur')) {
+                    unit = unit4;
+                } else {
+                    unit = '';
+                }
+                tableHtml += '<tr class="border-2"><th class="text-center text-blue-900 px-6 py-4 bg-gray-200 border-2 border-neutral-300">' + key + '</th><td class="text-center  border-2 border-neutral-300 px-8 py-4">' + value + ' ' + unit + '</td></tr>';
+            }
+            tableHtml += '</table>';
+            $('#' + tableId).html(tableHtml);
+        }
+
+        $(document).ready(function() {
+            fetchData();
+            setInterval(fetchData, 1000);
+        });
+    </script>
+</body>
+</html>
