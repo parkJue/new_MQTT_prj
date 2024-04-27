@@ -57,6 +57,27 @@ def write_data():
             all_values.extend(registers)
 
 
+        # 스케일링 방법 - 소수점세자리 방법 연구 필요 
+        # for key in pcs_data:
+        #     if 'vol' in key:
+        #         pcs_data[key] = random.uniform(400, 500)
+        #     elif key == 'frequency':
+        #         pcs_data[key] = random.uniform(60, 61)
+        #     else:
+        #         pcs_data[key] = random.uniform(0, 100)
+        # for key in bat_data:
+        #     bat_data[key] = random.uniform(0, 1000) if key in ['vol', 'cur'] else random.uniform(0, 100)
+        
+        # all_values = []
+        # max_value=65535
+        # for value in list(pcs_data.values()) + list(bat_data.values()):
+        #     scaled_value = int(value * scale_factor)
+        #     if scaled_value > max_value:
+        #         scaled_value = max_value  # 최대값을 초과하지 않도록 조정
+        #     scaled_value = round(scaled_value, 3)
+        #     all_values.append(scaled_value)
+
+
         # 레지스터에 모든 데이터를 한 번에 쓰기
         modtc.write_registers(0, all_values)
 
