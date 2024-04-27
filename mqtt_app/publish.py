@@ -1,6 +1,5 @@
 from pymodbus.client import ModbusTcpClient
 import random
-import threading
 from threading import Thread
 import time
 
@@ -36,8 +35,6 @@ bat_data = {
     'cur': 0,
 }
 
-
-
 def write_data():
     while True:
         for key in pcs_data:
@@ -59,8 +56,6 @@ def write_data():
 
 def read_data():
     while True:
- 
-        # 모든 데이터 읽기
         all_data = modtc.read_holding_registers(0, len(pcs_data) + len(bat_data), unit=1)
         if not all_data.isError():
             # 읽은 데이터를 적절하게 할당
