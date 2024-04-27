@@ -7,13 +7,6 @@
 </head>
 <body class="font-sans h-screen bg-gray-100 ">
     <div id="data-display">
-        <div class="bg-blue-600/40 text-white">
-            <header class="flex-grow ml-20">
-                <div id="cal-data" class="text-right text-3xl "></div>
-                <div id="time-data" class="text-right text-2xl"></div>
-            </header>
-            <hr>
-        </div>
         <div class="flex justify-between">
             <span class="ml-6 w-1/2 mt-5 text-center">
                 <h2 class="-mt-0 text-xl font-bold text-blue-800">PCS Data</h2>
@@ -34,9 +27,6 @@
                 success: function(response) {
                     displayTable(response['pcs_data'], 'pcs-table', 'W', 'Hz', 'V', 'A');
                     displayTable(response['bat_data'], 'bat-table', '%', '%', 'V', 'A');
-
-                    $('#cal-data').text(response['cal_data']);
-                    $('#time-data').text(response['time_data']); 
                 },
                 error: function() {
                     $('#data-display').html('<p>에러</p>');

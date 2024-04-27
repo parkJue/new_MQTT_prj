@@ -11,7 +11,7 @@ def on_connect(client, userdata, flags, rc):
     print('result code ' + str(rc))
 
 mqttc = mqtt.Client()
-modtc = Mod busTcpClient(host="127.0.0.1", port=502)
+modtc = ModbusTcpClient(host="127.0.0.1", port=502)
 
 mqttc.on_connect = on_connect
 mqttc.connect('localhost', 1883, 60)
