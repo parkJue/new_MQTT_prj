@@ -23,17 +23,24 @@
         function fetchData() {
             $.ajax({
                 url: '/fetch/',
-                type: 'GET', // GET방식으로 요청
+                type: 'GET',
                 success: function(response) {
-                    displayTable(response['pcs_data'], 'pcs-table', 'W', 'Hz', 'V', 'A');
-                    displayTable(response['bat_data'], 'bat-table', '%', '%', 'V', 'A');
+                    updateDisplay(response);
                 },
-                error: function() {
-                    $('#data-display').html('<p>데이터 불러오는 중 문제 발생</p>');
+                error: function(error) {
+                    showError('데이터를 불러오는 중 문제가 발생했습니다.');
                 }
             });
         }
-
+    
+        function updateDisplay(response) {
+            const { pcs_data, bat_data } = response;
+            if (dataHasChanged(pcs_data, 'pcs-table') || dataHasChanged(bat_data, 'bat-table')) {
+                displayTable(pcs_data, 'pcs-table', 'W', 'Hz', 'V', 'A');
+                displayTable(bat_data, 'bat-table', '%', '%', 'V', 'A');
+            }
+        }
+    
         function displayTable(data, tableId, ...units) {
             let tableHtml = `<table>`;
             Object.keys(data).forEach((key, index) => {
@@ -44,7 +51,16 @@
             tableHtml += `</table>`;
             $('#' + tableId).html(tableHtml);
         }
-
+    
+        function dataHasChanged(newData, tableId) {
+            const currentData = $('#' + tableId).data('current');
+            if (JSON.stringify(currentData) !== JSON.stringify(newData)) {
+                $('#' + tableId).data('current', newData);
+                return true;
+            }
+            return false;
+        }
+    
         function determineUnit(key, units) {
             if (key === 'active_power') return units[0];
             if (key.includes('SO')) return units[0];
@@ -53,11 +69,16 @@
             if (key.includes('cur')) return units[3];
             return '';
         }
-
+    
+        function showError(message) {
+            $('#data-display').html(`<p class="text-red-500">${message}</p>`);
+        }
+    
         $(document).ready(function() {
             fetchData();
             setInterval(fetchData, 1000);
         });
     </script>
+    
 </body>
 </html>

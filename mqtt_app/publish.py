@@ -1,9 +1,8 @@
 from pymodbus.client import ModbusTcpClient
 import random
-import threading
 from threading import Thread
 import time
-
+import struct
 import json
 import paho.mqtt.client as mqtt
 
@@ -11,7 +10,7 @@ def on_connect(client, userdata, flags, rc):
     print('result code ' + str(rc))
 
 mqttc = mqtt.Client()
-modtc = Mod busTcpClient(host="127.0.0.1", port=502)
+modtc = ModbusTcpClient(host="127.0.0.1", port=502)
 
 mqttc.on_connect = on_connect
 mqttc.connect('localhost', 1883, 60)
@@ -36,21 +35,26 @@ bat_data = {
     'cur': 0,
 }
 
-
-
 def write_data():
     while True:
+        # 부동소수점 값들을 직접 Modbus 레지스터에 저장 
         for key in pcs_data:
             if 'vol' in key:
-                pcs_data[key] = random.randint(400, 500)
+                pcs_data[key] = random.uniform(400, 500)
             elif key == 'frequency':
-                pcs_data[key] = random.randint(60, 61)
+                pcs_data[key] = random.uniform(60, 61)
             else:
-                pcs_data[key] = random.randint(0, 100)
+                pcs_data[key] = random.uniform(0, 100)
         for key in bat_data:
-            bat_data[key] = random.randint(0, 1000) if key in ['vol', 'cur'] else random.randint(0, 100)
+            bat_data[key] = random.uniform(0, 1000) if key in ['vol', 'cur'] else random.uniform(0, 100)
 
-        all_values = list(pcs_data.values()) + list(bat_data.values())
+
+        all_values = []
+        for value in list(pcs_data.values()) + list(bat_data.values()):
+            packed_data = struct.pack('>f', value)
+            registers = struct.unpack('>HH', packed_data)
+            all_values.extend(registers)
+
 
         # 레지스터에 모든 데이터를 한 번에 쓰기
         modtc.write_registers(0, all_values)
@@ -59,8 +63,6 @@ def write_data():
 
 def read_data():
     while True:
- 
-        # 모든 데이터 읽기
         all_data = modtc.read_holding_registers(0, len(pcs_data) + len(bat_data), unit=1)
         if not all_data.isError():
             # 읽은 데이터를 적절하게 할당
@@ -69,14 +71,13 @@ def read_data():
 
             for i, key in enumerate(pcs_data.keys()):
                 pcs_data[key] = pcs_values[i]
+                print('pcs_data : ', pcs_data)
             for i, key in enumerate(bat_data.keys()):
                 bat_data[key] = bat_values[i]
-
+                print('bat_data : ', bat_data)
+        # 딕셔너리 자료형을 JSON 문자열로 만들기
         mqttc.publish('sensor/pcs', json.dumps(pcs_data))
         mqttc.publish('sensor/bat', json.dumps(bat_data))
-
-        # print("PCS 데이터:", pcs_data)
-        # print("BAT 데이터:", bat_data)
         
 def main():
     try:
