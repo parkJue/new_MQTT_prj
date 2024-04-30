@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import redis
 import json
 
-redis_client =redis.Redis(host='localhost', port=6379)
+redis_client = redis.Redis(host='localhost', port=6379)
 
 # MQTT 클라이언트가 브로커에 연결되었을 때 호출
 # 연결이 성공적으로 이루어졌는지 확인하고 필요한 초기화 작업 수행
