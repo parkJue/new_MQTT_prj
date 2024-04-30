@@ -1,5 +1,6 @@
 from django.db import models
 
+# https://www.wool-dev.com/backend-engineering/spring/springboot-redis-cache
 class PCSModel(models.Model):
     active_power = models.FloatField()
     frequency = models.FloatField()
