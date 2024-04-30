@@ -23,7 +23,7 @@ client.on_message = on_message
 client.connect('localhost', 1883, 60)
 
 
-client.subscribe('sensor/pcs')
-client.subscribe('sensor/bat')
+client.subscribe('mqtt/pcs')
+client.subscribe('mqtt/bat')
 
 client.loop_forever()
