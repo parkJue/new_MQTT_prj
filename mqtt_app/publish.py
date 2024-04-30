@@ -36,6 +36,7 @@ bat_data = {
 }
 
 def write_data():
+    scale_factor = 1000
     while True:
         # 부동소수점 값들을 직접 Modbus 레지스터에 저장 
         for key in pcs_data:
